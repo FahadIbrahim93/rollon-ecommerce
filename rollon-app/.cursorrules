@@ -1,0 +1,205 @@
+# RollON App - Agent Guidelines
+
+This document provides guidelines for agents working on the RollON e-commerce application.
+
+## Project Overview
+
+RollON is a React 19 + TypeScript e-commerce application using Vite, Tailwind CSS v4, Zustand for state management, and Radix UI for components.
+
+## Working Directory
+
+The main application code is in: `C:\Users\fhdib\Downloads\Kimi_Agent_Deployment_v1\rollon-app`
+
+---
+
+## Build / Lint / Test Commands
+
+All commands should be run from the `rollon-app` directory:
+
+```bash
+cd C:\Users\fhdib\Downloads\Kimi_Agent_Deployment_v1\rollon-app
+```
+
+### Development
+```bash
+npm run dev          # Start Vite dev server
+```
+
+### Building
+```bash
+npm run build        # Type-check (tsc -b) and build for production
+npm run preview      # Preview production build
+```
+
+### Linting
+```bash
+npm run lint         # Run ESLint on all files
+```
+
+### Testing
+```bash
+npm run test              # Run all tests with Vitest
+npm run test -- run      # Run tests once (non-watch mode)
+npm run test -- Cart      # Run tests matching "Cart"
+npm run test -- --ui      # Run tests with Vitest UI
+```
+
+To run a **single test file**, use the file path:
+```bash
+npm run test -- src/context/__tests__/CartContext.test.tsx
+```
+
+---
+
+## Code Style Guidelines
+
+### TypeScript
+- Use explicit type annotations for function parameters and return types
+- Use `type` for interfaces and unions, `interface` for object shapes
+- Import types using `import type { TypeName }` syntax
+
+### Imports
+- Use `@/` alias for src directory (e.g., `@/components`, `@/store`, `@/types`)
+- Order imports: external libraries → internal components → utilities → types
+- Example:
+```typescript
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import type { Product } from '@/types';
+```
+
+### Component Structure
+- Use named exports for components
+- Use function components with TypeScript
+- Place components in `src/components/`, pages in `src/pages/`
+- UI primitives in `src/components/ui/`
+- Tests in `__tests__` directories alongside components
+
+### Naming Conventions
+- **Files**: kebab-case (e.g., `cart-store.ts`, `product-detail.tsx`)
+- **Components**: PascalCase (e.g., `Hero`, `CartDrawer`)
+- **Hooks**: camelCase with `use` prefix (e.g., `useCart`, `useAuth`)
+- **Types/Interfaces**: PascalCase (e.g., `CartItem`, `Product`)
+- **Constants**: SCREAMING_SNAKE_CASE for config values
+
+### Styling
+- Use Tailwind CSS utility classes
+- Use `cn()` utility from `@/lib/utils` for conditional classes
+- Use `cva()` for component variants (see button.tsx as example)
+- Avoid inline styles; use Tailwind classes
+
+### State Management
+- Use Zustand stores in `src/store/` directory
+- Follow pattern in `cartStore.ts`: interface definition, then create store
+- Use `persist` middleware for localStorage persistence
+
+### Error Handling
+- Use ErrorBoundary components for catching render errors
+- Display user-friendly error messages with try/catch in async functions
+- Log errors appropriately for debugging
+
+### Animations
+- Use Framer Motion for complex animations
+- Follow existing patterns in Hero.tsx for scroll-based animations
+
+### Form Handling
+- Use React Hook Form with Zod validation
+- Use `@hookform/resolvers` for Zod integration
+
+---
+
+## Key Dependencies
+
+- **React 19** - UI framework
+- **TypeScript ~5.9** - Type safety
+- **Vite 7** - Build tool
+- **Tailwind CSS 4** - Styling
+- **Zustand 5** - State management
+- **Radix UI** - Accessible component primitives
+- **Framer Motion 12** - Animations
+- **Vitest 4** - Testing
+- **Zod 4** - Schema validation
+
+---
+
+## Testing Guidelines
+
+- Tests use Vitest with jsdom environment
+- Use `@testing-library/react` for component testing
+- Use `@testing-library/jest-dom` for DOM assertions
+- Follow existing test patterns in `src/context/__tests__/CartContext.test.tsx`
+
+---
+
+## File Organization
+
+```
+rollon-app/
+├── src/
+│   ├── components/       # Reusable UI components
+│   │   ├── ui/          # Radix UI based primitives
+│   │   └── __tests__/   # Component tests
+│   ├── pages/           # Route page components
+│   ├── store/           # Zustand stores
+│   ├── context/         # React context providers
+│   ├── lib/             # Utilities
+│   ├── data/            # Static data
+│   └── types.ts         # Global type definitions
+├── package.json
+├── vite.config.ts
+├── tsconfig.json
+└── eslint.config.js
+```
+
+---
+
+## Common Patterns
+
+### Creating a new component with variants:
+```typescript
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+
+const componentVariants = cva("base-classes", {
+  variants: {
+    variant: {
+      default: "default-styles",
+      outlined: "outlined-styles",
+    },
+    size: {
+      sm: "h-8 px-3",
+      lg: "h-12 px-8",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+    size: "default",
+  },
+});
+
+export function Component({ 
+  className, 
+  variant, 
+  size 
+}: React.ComponentProps<"div"> & 
+  VariantProps<typeof componentVariants>) {
+  return (
+    <div className={cn(componentVariants({ variant, size }), className)}>
+      {/* content */}
+    </div>
+  );
+}
+```
+
+### Using Zustand store:
+```typescript
+import { useStoreName } from '@/store/storeName';
+
+function Component() {
+  const { items, addItem } = useStoreName();
+  // ...
+}
+```
